@@ -1,0 +1,93 @@
+<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
+                 xmlns:h="http://java.sun.com/jsf/html"
+                 xmlns:f="http://java.sun.com/jsf/core"
+                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                 xmlns:p="http://primefaces.org/ui"
+                 template="/template/mainTemplate.xhtml"
+                 xmlns:x="http://xpert.com/faces">
+    
+  
+    <ui:param name="title" value="#{msg['licenca.list']}" />
+    
+    <ui:define name="body">
+        <ui:include src="menuLicenca.xhtml" />
+        <h:form id="formListLicenca">
+            <x:modalMessages/>
+
+            <x:dataTableActions fileName="licenca_export" target=":formListLicenca:dataTableLicenca"
+                                     widgetVar="dataTableLicencaWidget"  />
+
+            <p:dataTable paginator="true" rows="10" rowsPerPageTemplate="10,20,30" paginatorPosition="bottom" emptyMessage="#{xmsg['noRecordFound']}"
+                         var="licenca" rowIndexVar="index" id="dataTableLicenca" widgetVar="dataTableLicencaWidget" styleClass="table-responsive"
+                         currentPageReportTemplate="#{licencaMB.dataModel.currentPageReportTemplate}"
+                         paginatorTemplate="#{licencaMB.dataModel.paginatorTemplate}"
+                         value="#{licencaMB.dataModel}" lazy="true">
+                <p:column styleClass="uix-datatable-index">
+                    <h:outputText value="#{index+1}"/>
+                </p:column>
+                <p:column headerText="#{msg['licenca.nomeSoftware']}" sortBy="#{licenca.nomeSoftware}"
+                    filterBy="#{licenca.nomeSoftware}"   >
+                    <f:facet name="header">
+                        <h:outputText value="#{msg['licenca.nomeSoftware']}" />
+                    </f:facet>
+                    <h:outputText value="#{licenca.nomeSoftware}"/>
+                </p:column>
+                <p:column headerText="#{msg['licenca.tipoSoftware']}" sortBy="#{licenca.tipoSoftware}"
+                    filterBy="#{licenca.tipoSoftware}"  filterOptions="#{findAllBean.getSelect(classMB.tipoSoftware)}" >
+                    <f:facet name="header">
+                        <h:outputText value="#{msg['licenca.tipoSoftware']}" />
+                    </f:facet>
+                    <h:outputText value="#{licenca.tipoSoftware}"/>
+                </p:column>
+                <p:column headerText="#{msg['licenca.serial']}" sortBy="#{licenca.serial}"
+                    filterBy="#{licenca.serial}"   >
+                    <f:facet name="header">
+                        <h:outputText value="#{msg['licenca.serial']}" />
+                    </f:facet>
+                    <h:outputText value="#{licenca.serial}"/>
+                </p:column>
+                <p:column headerText="#{msg['licenca.dataExpriracao']}" sortBy="#{licenca.dataExpriracao}"
+                          filterBy="#{licenca.dataExpriracao}"   style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="#{msg['licenca.dataExpriracao']}" />
+                        <x:dateFilter/>
+                    </f:facet>
+                    <h:outputText value="#{licenca.dataExpriracao}" >
+                        <f:convertDateTime />
+                    </h:outputText>
+                </p:column>
+                <p:column styleClass="uix-datatable-actions" exportable="false" headerText="#{xmsg['actions']}">
+                    <f:facet name="header">
+                        <h:outputText value="#{xmsg['actions']}"/>
+                    </f:facet>
+                    <p:commandButton oncomplete="PF('widgetLicencaDetail').show();"  icon="ui-icon-zoomin" 
+                                     process="@form" update=":formDetailLicenca" title="#{xmsg['detail']}" >
+                        <f:setPropertyActionListener value="#{licenca}" target="#{licencaMB.entity}" />
+                    </p:commandButton>
+                    <x:securityArea rolesAllowed="licenca.create">
+                        <p:button icon="ui-icon-pencil" outcome="createLicenca" title="#{xmsg['edit']}">
+                            <f:param name="id" value="#{licenca.id}" />
+                        </p:button>
+                    </x:securityArea>
+                    <x:securityArea rolesAllowed="licenca.delete">
+                        <p:commandButton icon="ui-icon-trash" title="#{xmsg['delete']}" process="@form" update="@form" 
+                                         action="#{licencaMB.delete}" >
+                            <f:setPropertyActionListener value="#{licenca.id}" target="#{licencaMB.id}" />
+                            <x:confirmation message="#{xmsg['confirmDelete']} - #{licenca}" />
+                        </p:commandButton>
+                    </x:securityArea>
+                </p:column>
+            </p:dataTable>
+            <div class="uix-audit-delete">
+                <x:securityArea rolesAllowed="licenca.audit">
+                    <x:auditDelete for="#{licencaMB.entityClass}"/>
+                </x:securityArea>
+            </div>  
+        </h:form>
+
+        <p:dialog widgetVar="widgetLicencaDetail" header="#{msg['licenca.detail']}" appendTo="@(body)" 
+                  modal="true" styleClass="uix-dialog-fluid" >
+                  <ui:include src="detailLicenca.xhtml" />
+        </p:dialog>
+    </ui:define>
+</ui:composition>
